@@ -5,6 +5,12 @@ data class Card(
     val cardColor: CardColor,
     val cardType: CardType
 ){
-
+    override fun toString(): String {
+        if(cardNumber >= 0){
+            return cardNumber.toString() + " " + cardColor.colorName + "\n"
+        }else{
+            return cardType.typeName + " " + cardColor.colorName + "\n"
+        }
+    }
 
 }

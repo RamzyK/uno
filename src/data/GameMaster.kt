@@ -10,14 +10,15 @@ object GameMaster{
 
     var playerAccount = 4
     var gameDeck : MutableList<Card> = mutableListOf()
-    var playedCards : List<Card> = emptyList()
+    var playedCards : MutableList<Card> = mutableListOf()
     var playingDirection: GameDirection = GameDirection.RIGHT
     lateinit var currentPlayer: Player
     lateinit var currentColor: CardColor
 
-    fun initGame() = prepareGame()
+    fun initGame(players: Int) = prepareGame(players)
 
-    private fun prepareGame() : Game{
+    private fun prepareGame(playersNumber: Int) : Game{
+        playerAccount = playersNumber
         val players: MutableList<Player> = mutableListOf()
 
         for(i in 0 until playerAccount){
