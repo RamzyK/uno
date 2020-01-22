@@ -7,9 +7,9 @@ data class Card(
 ){
     override fun toString(): String {
         if(cardNumber >= 0){
-            return cardNumber.toString() + " " + cardColor.colorName + "\n"
+            return cardNumber.toString() + " " + cardColor.colorName + " | "
         }else{
-            return cardType.typeName + " " + cardColor.colorName + "\n"
+            return cardType.typeName + " " + cardColor.colorName + " | "
         }
     }
 
