@@ -31,8 +31,8 @@ class GameConsole(): GameView {
     }
 
     override fun putFirstCardFromDeck() {
-        println("\n1ere carte: " + GameMaster.playedCards.first())
-        println("La partie peut commencer!\n")
+        println("La partie peut commencer!\n\n\n")
+        println("PREMIÈRE CARTE JOUÉE: " + GameMaster.playedCards.first() + "\n\n")
         presenter.manageTurns()
     }
 

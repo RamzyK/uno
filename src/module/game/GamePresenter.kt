@@ -88,10 +88,6 @@ class GamePresenter(var view: GameView){
 
     private fun checkCardIsPossibleToPlay(card: Card){
         // Last card played is a power card
-        GameMaster.playedCards.add(0, card)
-        GameMaster.currentPlayer.cards.remove(card)
-        println("dernière carte jouée: " + GameMaster.playedCards[0])
-
         when(card.cardType){
             CardType.BLOCK_NEXT -> blockNextPlayer()
             CardType.CHANGE_SENS -> changeGameDirection()
@@ -106,15 +102,14 @@ class GamePresenter(var view: GameView){
     // region * * * * * * * * * * * * * * * SPECIAL CARDS ACTION SECTION * * * * * * * * * * * * * * *
     private fun normalCardPlayed(card: Card){
         val lastCardPlayed = GameMaster.playedCards[0]
-        var lastPlayerPosition: Int = game.players.indexOf(GameMaster.currentPlayer)
+        val lastPlayerPosition: Int = game.players.indexOf(GameMaster.currentPlayer)
 
         // Last card played is a normal card
         if(card.cardNumber == lastCardPlayed.cardNumber || card.cardColor == lastCardPlayed.cardColor){
             // Same number, same or different color
-            GameMaster.playedCards.add(0, card)
-            println("dernière carte jouée: " + GameMaster.playedCards[0])
-            GameMaster.currentPlayer.cards.remove(card)
             GameMaster.currentPlayer = game.players[(lastPlayerPosition+1) % (game.players.size)]
+            GameMaster.playedCards.add(0, card)
+            GameMaster.currentPlayer.cards.remove(card)
             manageTurns()
         }else{
             // Card had different number or different color
