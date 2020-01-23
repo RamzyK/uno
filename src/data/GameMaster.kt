@@ -45,9 +45,9 @@ object GameMaster{
         var cards : MutableList<Card> = mutableListOf()
 
         cards.addAll(generateCardsFor(CardColor.BLUE))
-        cards.addAll(generateCardsFor(CardColor.RED))
-        cards.addAll(generateCardsFor(CardColor.GREEN))
-        cards.addAll(generateCardsFor(CardColor.YELLOW))
+        //cards.addAll(generateCardsFor(CardColor.RED))
+        //cards.addAll(generateCardsFor(CardColor.GREEN))
+        //cards.addAll(generateCardsFor(CardColor.YELLOW))
 
         cards.addAll(generatePowerCards())
 
@@ -78,12 +78,12 @@ object GameMaster{
             powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.CHANGE_SENS))
             powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.CHANGE_SENS))
             // Add 2  block next
-            powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.BLOCK_NEXT))
-            powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.BLOCK_NEXT))
+            //powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.BLOCK_NEXT))
+            //powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.BLOCK_NEXT))
             // Add 1  Joker
-            powerCards.add(Card(cardNumber = -1, cardColor = CardColor.POWER, cardType = CardType.JOKER))
+            //powerCards.add(Card(cardNumber = -1, cardColor = CardColor.POWER, cardType = CardType.JOKER))
             // Add 1  +4
-            powerCards.add(Card(cardNumber = -1, cardColor = CardColor.POWER, cardType = CardType.PLUS_4))
+            //powerCards.add(Card(cardNumber = -1, cardColor = CardColor.POWER, cardType = CardType.PLUS_4))
         }
 
         return powerCards

@@ -143,9 +143,9 @@ class GamePresenter(var view: GameView){
     }
 
     private fun changeGameDirection(){
-        val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
         game.players.reverse()
-        val nextPlayerPosition = (currentPlayerIndex + 1) % (game.players.size)
+        val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
+        val nextPlayerPosition = ((currentPlayerIndex + 1) % (game.players.size))
         GameMaster.currentPlayer = game.players[nextPlayerPosition]
     }
 
