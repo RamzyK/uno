@@ -9,7 +9,6 @@ import data.model.game.Game
 class GamePresenter(var view: GameView){
 
     private lateinit var game: Game
-    private lateinit var gameMaster: GameMaster
 
     fun initGame() {
         view.showWelcomeMessage()
@@ -90,6 +89,9 @@ class GamePresenter(var view: GameView){
             CardType.JOKER -> addJokerCard(card)
             CardType.NORMAL -> normalCardPlayed(card)
         }
+        if(GameMaster.currentPlayer.cards.size == 1){
+            view.shoutUno()
+        }
         manageTurns()
     }
 
@@ -111,6 +113,12 @@ class GamePresenter(var view: GameView){
             }
             CardType.JOKER -> print("Choisir une couleur NOT DONE")
         }
+    }
+
+    private fun goToNextPlayer(){
+        val currentPlayerPos = game.players.indexOf(GameMaster.currentPlayer)
+        val newCurrentPlayerPos = (currentPlayerPos + 1)%(game.players.size)
+        GameMaster.currentPlayer = game.players.get(newCurrentPlayerPos)
     }
 
     // region * * * * * * * * * * * * * * * SPECIAL CARDS ACTION SECTION * * * * * * * * * * * * * * *
@@ -226,9 +234,9 @@ class GamePresenter(var view: GameView){
     private fun pioche(){
         GameMaster.currentPlayer.cards.add(GameMaster.gameDeck[0])
         GameMaster.gameDeck.removeAt(0)
-        print("Tu as pioché une carte")
-        print(GameMaster.currentPlayer.cards)
-        playTheCard()
+        println("${GameMaster.currentPlayer.name} a pioché\n")
+        goToNextPlayer()
+        manageTurns()
     }
 
     private fun checkPlayerCardChoice(it: String){
@@ -240,7 +248,7 @@ class GamePresenter(var view: GameView){
             else -> {
                 val currentPlayerCardsSize = GameMaster.currentPlayer.cards.size
                 val pos = it.toInt() - 1
-                if(currentPlayerCardsSize >= 2 && pos >= 0 && pos <= currentPlayerCardsSize){
+                if(currentPlayerCardsSize >= 2 && pos >= 0 && pos < currentPlayerCardsSize){
                     checkCardIsPossibleToPlay(GameMaster.currentPlayer.cards[pos])
                 }else{
                     view.showWtfResponseMessage("Aucune carte à cette position, rééssayez\n")
