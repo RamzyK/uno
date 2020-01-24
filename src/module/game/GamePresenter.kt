@@ -85,7 +85,7 @@ class GamePresenter(var view: GameView){
             CardType.BLOCK_NEXT -> blockNextPlayer()
             CardType.CHANGE_SENS -> changeGameDirection(card)
             CardType.PLUS_4 -> addPlus4Card(card)
-            CardType.PLUS_2 -> addPlus2Card()
+            CardType.PLUS_2 -> addPlus2Card(card)
             CardType.JOKER -> addJokerCard(card)
             CardType.NORMAL -> normalCardPlayed(card)
         }
@@ -141,16 +141,23 @@ class GamePresenter(var view: GameView){
         }
     }
 
-    private fun addPlus2Card(){
+    private fun addPlus2Card(card: Card){
         val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
-        for(c in 0 until 2){
-            game.players
-                .get((currentPlayerIndex + 1) % (game.players.size))
-                .cards.add(GameMaster.gameDeck[0])
-            GameMaster.gameDeck.removeAt(0)
+        val lastCardPlayed = GameMaster.playedCards[0]
+        if (lastCardPlayed.cardColor == card.cardColor || lastCardPlayed.cardType == card.cardType) {
+            for(c in 0 until 2){
+                game.players[(currentPlayerIndex + 1) % (game.players.size)]
+                    .cards.add(GameMaster.gameDeck[0])
+                GameMaster.gameDeck.removeAt(0)
+            }
+            GameMaster.playedCards.add(0, card)
+            GameMaster.currentPlayer.cards.remove(card)
+            GameMaster.currentPlayer = game.players[(currentPlayerIndex + 2) % (game.players.size)]
+        } else {
+            // Card has different number or different color
+            view.shosErroCardChosen()
+            playTheCard()
         }
-        val nextPlayerPosition = (currentPlayerIndex + 2) % (game.players.size)
-        GameMaster.currentPlayer = game.players[nextPlayerPosition]
     }
 
     private fun addPlus4Card(card: Card){
