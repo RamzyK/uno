@@ -95,7 +95,7 @@ class GamePresenter(var view: GameView){
         when(card.cardType){
             CardType.BLOCK_NEXT -> blockNextPlayer()
             CardType.CHANGE_SENS -> changeGameDirection()
-            CardType.PLUS_4 -> addPlus4Card()
+            CardType.PLUS_4 -> addPlus4Card(card)
             CardType.PLUS_2 -> addPlus2Card()
             CardType.JOKER -> addJokerCard(card)
             CardType.NORMAL -> normalCardPlayed(card)
@@ -135,16 +135,15 @@ class GamePresenter(var view: GameView){
         GameMaster.currentPlayer = game.players[nextPlayerPosition]
     }
 
-    private fun addPlus4Card(){
+    private fun addPlus4Card(card: Card){
         val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
-        for(c in 0 until 4){
+        for(c in 0 until 4) {
             game.players
                 .get((currentPlayerIndex + 1) % (game.players.size))
                 .cards.add(GameMaster.gameDeck[0])
             GameMaster.gameDeck.removeAt(0)
         }
-        val nextPlayerPosition = (currentPlayerIndex + 2) % (game.players.size)
-        GameMaster.currentPlayer = game.players[nextPlayerPosition]
+        addJokerCard(card)
     }
 
     private fun changeGameDirection(){
@@ -160,6 +159,7 @@ class GamePresenter(var view: GameView){
     }
 
     private fun addJokerCard(card: Card){
+        val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
         println("Quelle couleur veux-tu choisir ?")
         var count = 1
         for(color in CardColor.values()){
@@ -187,6 +187,8 @@ class GamePresenter(var view: GameView){
                 checkCardIsPossibleToPlay(card)
             }
         }
+        val nextPlayerPosition = (currentPlayerIndex + 2) % (game.players.size)
+        GameMaster.currentPlayer = game.players[nextPlayerPosition]
     }
     //endregion
 
