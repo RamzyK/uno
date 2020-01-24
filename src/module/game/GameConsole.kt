@@ -16,6 +16,7 @@ class GameConsole(): GameView {
     //region  * * * Override functions * * *
     override fun showWelcomeMessage() {
        println(huge_title)
+
     }
 
     override fun askForPlayersNumber() {
@@ -24,6 +25,11 @@ class GameConsole(): GameView {
             presenter.manageResponse(response = it)
         }
     }
+
+    override fun initializingPlayersMessage(response: String) {
+        println("Très bien, nous initialisont les $response joueurs, veuillez patienter...\n\n")
+    }
+
     override fun showPlayers(game: Game) {
         for(player in game.players){
             println(player )
@@ -31,9 +37,15 @@ class GameConsole(): GameView {
     }
 
     override fun putFirstCardFromDeck() {
-        println("\n1ere carte: " + GameMaster.playedCards.first())
-        println("La partie peut commencer!\n")
+        println("La partie peut commencer!\n\n\n")
         presenter.manageTurns()
+    }
+
+    override fun showCurrentPlayer() {
+        print(GameMaster.currentPlayer.name + ", À toi de jouer:\n\n")
+        print("Tes cartes: " + GameMaster.currentPlayer.cards)
+        print("\nQuelle carte veux-tu jouer (position entre 1 & " + GameMaster.currentPlayer.cards.size + ")? \n\n")
+        print("p pour la pioche\n")
     }
 
     override fun showWtfResponseMessage(errorMessage: String) {
@@ -41,7 +53,9 @@ class GameConsole(): GameView {
     }
 
     override fun showPlayedCard() {
-
+        val lastCardPlayed = GameMaster.playedCards.first()
+        print("DERNIÈRE CARTE JOUÉE: $lastCardPlayed | ")
+        println("Couleur actuelle: ${lastCardPlayed.cardColor.colorName}\n\n")
     }
 
     override fun showPowerCardActionOnNextPlayer() {

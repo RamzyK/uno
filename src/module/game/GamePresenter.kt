@@ -16,23 +16,6 @@ class GamePresenter(var view: GameView){
         view.askForPlayersNumber()
     }
 
-    fun initPlayers(playerNumber: Int){
-        with(GameMaster){
-            game = initGame(playerNumber)
-            playedCards.add(gameDeck.first())
-            currentColor = gameDeck.first().cardColor
-            if(gameDeck.first().cardType == CardType.NORMAL){
-                currentPlayer = game.players.first()
-            }else{
-                currentPlayer = game.players[1]
-            }
-            gameDeck.removeAt(0)
-        }
-        view.showPlayers(game)
-
-        view.putFirstCardFromDeck()
-    }
-
     fun manageResponse(response: String){
         if(response.isNotEmpty()){
             when(response.toIntOrNull()) {
@@ -42,7 +25,7 @@ class GamePresenter(var view: GameView){
                 }
                 else -> {
                     if(response.toInt() > 1){
-                        println("Très bien, nous initialisont les $response joueurs, veuillez patienter...\n\n")
+                        view.initializingPlayersMessage(response)
                         initPlayers(playerNumber = response.toInt())
                     }else{
                         view.showWtfResponseMessage("Il faut au moins 2 joueurs\n\n")
@@ -56,15 +39,26 @@ class GamePresenter(var view: GameView){
         }
     }
 
-    fun manageTurns() {
+    fun initPlayers(playerNumber: Int){
         with(GameMaster){
-            print(currentPlayer.name + ", À toi de jouer:\n\n")
-            print(currentPlayer.cards)
-            print("\n\nQuelle carte veux-tu jouer (position entre 1 & "
-                    + currentPlayer.cards.size
-                    +")? \n")
-            print("p pour la pioche\n")
+            game = initGame(playerNumber)
+            playedCards.add(gameDeck.first())
+            currentColor = gameDeck.first().cardColor
+            if(gameDeck.first().cardType == CardType.NORMAL){
+                currentPlayer = game.players.first()
+            }else{
+                firstCardIsPowerAction(gameDeck.first())
+            }
+            gameDeck.removeAt(0)
         }
+        view.showPlayers(game)
+
+        view.putFirstCardFromDeck()
+    }
+
+    fun manageTurns() {
+        view.showPlayedCard()
+        view.showCurrentPlayer()
         playTheCard()
     }
 
@@ -88,14 +82,10 @@ class GamePresenter(var view: GameView){
 
     private fun checkCardIsPossibleToPlay(card: Card){
         // Last card played is a power card
-        GameMaster.playedCards.add(0, card)
-        GameMaster.currentPlayer.cards.remove(card)
-        println("dernière carte jouée: " + GameMaster.playedCards[0])
-
         when(card.cardType){
             CardType.BLOCK_NEXT -> blockNextPlayer()
-            CardType.CHANGE_SENS -> changeGameDirection()
-            CardType.PLUS_4 -> addPlus4Card()
+            CardType.CHANGE_SENS -> changeGameDirection(card)
+            CardType.PLUS_4 -> addPlus4Card(card)
             CardType.PLUS_2 -> addPlus2Card()
             CardType.JOKER -> addJokerCard(card)
             CardType.NORMAL -> normalCardPlayed(card)
@@ -103,16 +93,36 @@ class GamePresenter(var view: GameView){
         manageTurns()
     }
 
+    private fun firstCardIsPowerAction(card: Card){
+        when(card.cardType){
+            CardType.BLOCK_NEXT -> {GameMaster.currentPlayer = game.players[1]}
+            CardType.CHANGE_SENS -> {game.players.reverse()}
+            CardType.PLUS_4 -> {
+                for(i in 0 until 4){
+                    GameMaster.currentPlayer.cards.add(GameMaster.gameDeck[0])
+                    GameMaster.gameDeck.removeAt(0)
+                }
+            }
+            CardType.PLUS_2 -> {
+                for(i in 0 until 4){
+                    GameMaster.currentPlayer.cards.add(GameMaster.gameDeck[0])
+                    GameMaster.gameDeck.removeAt(0)
+                }
+            }
+            CardType.JOKER -> print("Choisir une couleur NOT DONE")
+        }
+    }
+
     // region * * * * * * * * * * * * * * * SPECIAL CARDS ACTION SECTION * * * * * * * * * * * * * * *
     private fun normalCardPlayed(card: Card){
         val lastCardPlayed = GameMaster.playedCards[0]
-        var lastPlayerPosition: Int = game.players.indexOf(GameMaster.currentPlayer)
+        val lastPlayerPosition: Int = game.players.indexOf(GameMaster.currentPlayer)
 
         // Last card played is a normal card
         if(card.cardNumber == lastCardPlayed.cardNumber || card.cardColor == lastCardPlayed.cardColor){
             // Same number, same or different color
+
             GameMaster.playedCards.add(0, card)
-            println("dernière carte jouée: " + GameMaster.playedCards[0])
             GameMaster.currentPlayer.cards.remove(card)
             GameMaster.currentPlayer = game.players[(lastPlayerPosition+1) % (game.players.size)]
             manageTurns()
@@ -135,22 +145,39 @@ class GamePresenter(var view: GameView){
         GameMaster.currentPlayer = game.players[nextPlayerPosition]
     }
 
-    private fun addPlus4Card(){
+    private fun addPlus4Card(card: Card){
         val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
-        for(c in 0 until 4){
+        for(c in 0 until 4) {
             game.players
                 .get((currentPlayerIndex + 1) % (game.players.size))
                 .cards.add(GameMaster.gameDeck[0])
             GameMaster.gameDeck.removeAt(0)
         }
-        val nextPlayerPosition = (currentPlayerIndex + 2) % (game.players.size)
-        GameMaster.currentPlayer = game.players[nextPlayerPosition]
+        addJokerCard(card)
     }
 
-    private fun changeGameDirection(){
-        val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
+    private fun changeGameDirection(card: Card){
+        if(GameMaster.playedCards[0].cardType == CardType.CHANGE_SENS){
+            // Last card was not a normal card
+            reversePlayers(card)
+        }else{
+            // Last card was a normal card
+            if(GameMaster.playedCards[0].cardColor == card.cardColor){
+                reversePlayers(card)
+            }else{
+                view.shosErroCardChosen()
+                playTheCard()
+            }
+        }
+
+    }
+
+    private fun reversePlayers(card: Card){
+        GameMaster.currentPlayer.cards.remove(card)
         game.players.reverse()
-        val nextPlayerPosition = (currentPlayerIndex + 1) % (game.players.size)
+        val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
+        val nextPlayerPosition = ((currentPlayerIndex + 1) % (game.players.size))
+        GameMaster.playedCards.add(0, card)
         GameMaster.currentPlayer = game.players[nextPlayerPosition]
     }
 
@@ -160,6 +187,7 @@ class GamePresenter(var view: GameView){
     }
 
     private fun addJokerCard(card: Card){
+        val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
         println("Quelle couleur veux-tu choisir ?")
         var count = 1
         for(color in CardColor.values()){
@@ -176,6 +204,8 @@ class GamePresenter(var view: GameView){
                     else -> {
                         GameMaster.currentColor = CardColor.values()[it.toInt() - 1]
                         println("Couleur du jeu: " + GameMaster.currentColor.colorName)
+                        val nextPlayerPosition = (currentPlayerIndex + 2) % (game.players.size)
+                        GameMaster.currentPlayer = game.players[nextPlayerPosition]
                         manageTurns()
                     }
                 }
@@ -187,6 +217,7 @@ class GamePresenter(var view: GameView){
                 checkCardIsPossibleToPlay(card)
             }
         }
+
     }
     //endregion
 
