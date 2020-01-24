@@ -204,6 +204,8 @@ class GamePresenter(var view: GameView){
                     else -> {
                         GameMaster.currentColor = CardColor.values()[it.toInt() - 1]
                         println("Couleur du jeu: " + GameMaster.currentColor.colorName)
+                        val nextPlayerPosition = (currentPlayerIndex + 2) % (game.players.size)
+                        GameMaster.currentPlayer = game.players[nextPlayerPosition]
                         manageTurns()
                     }
                 }
@@ -215,8 +217,7 @@ class GamePresenter(var view: GameView){
                 checkCardIsPossibleToPlay(card)
             }
         }
-        val nextPlayerPosition = (currentPlayerIndex + 2) % (game.players.size)
-        GameMaster.currentPlayer = game.players[nextPlayerPosition]
+
     }
     //endregion
 
