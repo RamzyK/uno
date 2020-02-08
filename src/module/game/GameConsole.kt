@@ -45,7 +45,7 @@ class GameConsole(): GameView {
         print(GameMaster.currentPlayer.name + ", À toi de jouer:\n\n")
         print("Tes cartes: " + GameMaster.currentPlayer.cards)
         print("\nQuelle carte veux-tu jouer (position entre 1 & " + GameMaster.currentPlayer.cards.size + ")? \n\n")
-        print("p pour la pioche\n")
+        if(GameMaster.currentPlayer.hasPickedUp) print("p pour passer le tour (Vous avez déjà pioché)\n") else print("p pour la pioche\n")
     }
 
     override fun showWtfResponseMessage(errorMessage: String) {
