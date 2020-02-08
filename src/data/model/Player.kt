@@ -5,16 +5,13 @@ import data.model.card.Card
 data class Player(
      var name: String,
      var cards: MutableList<Card>,
-     var shouldPlay: Boolean
+     var shouldPlay: Boolean,
+     var hasPickedUp: Boolean
 ){
 
 
      override fun toString(): String {
-          if(shouldPlay){
-               return name + "\nCartes: " + getCardsArrayToString() + "\n" + "C'est votre tour de jouer\n"
-          }else{
-               return name + "\nCartes: " + getCardsArrayToString() + "\n" + "Ce n'est pas votre tour de jouer\n"
-          }
+        return name + "\nCartes: " + getCardsArrayToString() + "\n" + if(shouldPlay) "C'est votre tour de jouer\n" else "Ce n'est pas votre tour de jouer\n"
      }
 
     private fun getCardsArrayToString(): String{

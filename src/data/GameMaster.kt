@@ -23,9 +23,9 @@ object GameMaster{
 
         for(i in 0 until playerAccount){
             if(i == 0){
-                players.add(Player(name = "Player$i", cards = mutableListOf(), shouldPlay = true))
+                players.add(Player(name = "Player$i", cards = mutableListOf(), shouldPlay = true, hasPickedUp = false))
             }else{
-                players.add(Player(name = "Player$i", cards = mutableListOf(), shouldPlay = false))
+                players.add(Player(name = "Player$i", cards = mutableListOf(), shouldPlay = false, hasPickedUp = false))
             }
 
         }
