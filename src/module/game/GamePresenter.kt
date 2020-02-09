@@ -19,7 +19,7 @@ class GamePresenter(var view: GameView) {
         if (response.isNotEmpty()) {
             when (response.toIntOrNull()) {
                 null -> {
-                    view.showWtfResponseMessage("Il faut entrer in nombre... pas autre chose.\n\n")
+                    view.showMessage("Il faut entrer un nombre... pas autre chose.\n\n")
                     view.askForPlayersNumber()
                 }
                 else -> {
@@ -27,18 +27,18 @@ class GamePresenter(var view: GameView) {
                         view.initializingPlayersMessage(response)
                         initPlayers(playerNumber = response.toInt())
                     } else {
-                        view.showWtfResponseMessage("Il faut au moins 2 joueurs\n\n")
+                        view.showMessage("Il faut au moins 2 joueurs\n\n")
                         view.askForPlayersNumber()
                     }
                 }
             }
         } else {
-            view.showWtfResponseMessage("Vous devez nous dire combien de jour il y'a avant de pouvoir commecner la partie \n\n")
+            view.showMessage("Vous devez nous dire combien de joueur il y a avant de pouvoir commencer la partie \n\n")
             view.askForPlayersNumber()
         }
     }
 
-    fun initPlayers(playerNumber: Int) {
+    private fun initPlayers(playerNumber: Int) {
         with(GameMaster) {
             game = initGame(playerNumber)
             playedCards.add(gameDeck.first())
@@ -51,7 +51,6 @@ class GamePresenter(var view: GameView) {
             gameDeck.removeAt(0)
         }
         view.showPlayers(game)
-
         view.putFirstCardFromDeck()
     }
 
@@ -61,18 +60,18 @@ class GamePresenter(var view: GameView) {
         playTheCard()
     }
 
-    fun playTheCard() {
+    private fun playTheCard() {
+        view.showMessage("Entre le numéro correspondant à la carte que tu veux jouer ;) : ")
         readLine()?.let {
             if (it.isNotEmpty()) {
                 if (it == "p") {
-                    pioche()
+                    drew()
                 } else {
                     checkPlayerCardChoice(it)
                 }
             } else {
-                view.showWtfResponseMessage("Il faut choisir une carte pour passer le tour\n")
-                print(
-                    "\n\nQuelle carte veux-tu jouer (position entre 1 & "
+                view.showMessage(
+                    "Il faut choisir une carte pour passer le tour\n\n\nQuelle carte veux-tu jouer (position entre 1 & "
                             + GameMaster.currentPlayer.cards.size
                             + ")? \n"
                 )
@@ -81,7 +80,7 @@ class GamePresenter(var view: GameView) {
         }
     }
 
-    private fun checkCardIsPossibleToPlay(card: Card) {
+    private fun isPossibleToPlay(card: Card) {
         // Last card played is a power card
         when (card.cardType) {
             CardType.BLOCK_NEXT -> blockNextPlayer()
@@ -118,13 +117,14 @@ class GamePresenter(var view: GameView) {
                 }
             }
             CardType.JOKER -> print("Choisir une couleur NOT DONE")
+            CardType.NORMAL -> return
         }
     }
 
     private fun goToNextPlayer() {
         val currentPlayerPos = game.players.indexOf(GameMaster.currentPlayer)
         val newCurrentPlayerPos = (currentPlayerPos + 1) % (game.players.size)
-        GameMaster.currentPlayer = game.players.get(newCurrentPlayerPos)
+        GameMaster.currentPlayer = game.players[newCurrentPlayerPos]
     }
 
     // region * * * * * * * * * * * * * * * SPECIAL CARDS ACTION SECTION * * * * * * * * * * * * * * *
@@ -135,14 +135,13 @@ class GamePresenter(var view: GameView) {
         // Last card played is a normal card
         if (card.cardNumber == lastCardPlayed.cardNumber || card.cardColor == lastCardPlayed.cardColor) {
             // Same number, same or different color
-
             GameMaster.playedCards.add(0, card)
             GameMaster.currentPlayer.cards.remove(card)
             GameMaster.currentPlayer = game.players[(lastPlayerPosition + 1) % (game.players.size)]
             manageTurns()
         } else {
             // Card had different number or different color
-            view.shosErroCardChosen()
+            view.showErrorCardChosen()
             playTheCard()
         }
     }
@@ -161,7 +160,7 @@ class GamePresenter(var view: GameView) {
             GameMaster.currentPlayer = game.players[(currentPlayerIndex + 2) % (game.players.size)]
         } else {
             // Card has different number or different color
-            view.shosErroCardChosen()
+            view.showErrorCardChosen()
             playTheCard()
         }
     }
@@ -169,8 +168,7 @@ class GamePresenter(var view: GameView) {
     private fun addPlus4Card(card: Card) {
         val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
         for (c in 0 until 4) {
-            game.players
-                .get((currentPlayerIndex + 1) % (game.players.size))
+            game.players[(currentPlayerIndex + 1) % (game.players.size)]
                 .cards.add(GameMaster.gameDeck[0])
             GameMaster.gameDeck.removeAt(0)
         }
@@ -186,7 +184,7 @@ class GamePresenter(var view: GameView) {
             if (GameMaster.playedCards[0].cardColor == card.cardColor) {
                 reversePlayers(card)
             } else {
-                view.shosErroCardChosen()
+                view.showErrorCardChosen()
                 playTheCard()
             }
         }
@@ -219,8 +217,8 @@ class GamePresenter(var view: GameView) {
             if (it.isNotEmpty()) {
                 when (it.toIntOrNull()) {
                     null -> {
-                        view.showWtfResponseMessage("Mauvaise position, rééssaye\n\n")
-                        checkCardIsPossibleToPlay(card)
+                        view.showMessage("Mauvaise position, rééssaye\n\n")
+                        isPossibleToPlay(card)
                     }
                     else -> {
                         GameMaster.currentColor = CardColor.values()[it.toInt() - 1]
@@ -231,13 +229,13 @@ class GamePresenter(var view: GameView) {
                     }
                 }
             } else {
-                view.showWtfResponseMessage("Il faut choisir une carte pour passer le tour\n")
+                view.showMessage("Il faut choisir une carte pour passer le tour\n")
                 print(
                     "\n\nQuelle carte veux-tu jouer (position entre 1 & "
                             + GameMaster.currentPlayer.cards.size
                             + ")? \n"
                 )
-                checkCardIsPossibleToPlay(card)
+                isPossibleToPlay(card)
             }
         }
 
@@ -246,7 +244,7 @@ class GamePresenter(var view: GameView) {
 
 
     // region * * * * * * * * * * * * * * * GAME ACTIONS * * * * * * * * * * * * * * *
-    private fun pioche() {
+    private fun drew() {
         if (GameMaster.currentPlayer.hasPickedUp) {
             GameMaster.currentPlayer.hasPickedUp = false
             goToNextPlayer()
@@ -268,16 +266,16 @@ class GamePresenter(var view: GameView) {
     private fun checkPlayerCardChoice(it: String) {
         when (it.toIntOrNull()) {
             null -> {
-                view.showWtfResponseMessage("Mauvaise position, rééssaye\n\n")
+                view.showMessage("Mauvaise réponse bonhomme, retente ta chance !\n\n")
                 playTheCard()
             }
             else -> {
                 val currentPlayerCardsSize = GameMaster.currentPlayer.cards.size
                 val pos = it.toInt() - 1
                 if (currentPlayerCardsSize >= 2 && pos >= 0 && pos < currentPlayerCardsSize) {
-                    checkCardIsPossibleToPlay(GameMaster.currentPlayer.cards[pos])
+                    isPossibleToPlay(GameMaster.currentPlayer.cards[pos])
                 } else {
-                    view.showWtfResponseMessage("Aucune carte à cette position, rééssayez\n")
+                    view.showMessage("Aucune carte à cette position, rééssayez\n")
                     playTheCard()
                 }
             }

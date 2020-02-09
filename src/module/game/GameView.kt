@@ -10,10 +10,10 @@ interface GameView{
     fun showPlayers(game: Game)
     fun showCurrentPlayer()
     fun putFirstCardFromDeck()
-    fun showWtfResponseMessage(error_message: String)
+    fun showMessage(message: String)
     fun showPlayedCard()
     fun showPowerCardActionOnNextPlayer()
     fun shoutUno()
-    fun shosErroCardChosen()
+    fun showErrorCardChosen()
     
 }

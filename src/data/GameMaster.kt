@@ -6,25 +6,24 @@ import data.model.card.CardColor
 import data.model.card.CardType
 import data.model.game.Game
 
-object GameMaster{
+object GameMaster {
 
     var playerAccount = 4
-    var gameDeck : MutableList<Card> = mutableListOf()
-    var playedCards : MutableList<Card> = mutableListOf()
-    var playingDirection: GameDirection = GameDirection.RIGHT
+    var gameDeck: MutableList<Card> = mutableListOf()
+    var playedCards: MutableList<Card> = mutableListOf()
     lateinit var currentPlayer: Player
     lateinit var currentColor: CardColor
 
     fun initGame(players: Int) = prepareGame(players)
 
-    private fun prepareGame(playersNumber: Int) : Game{
+    private fun prepareGame(playersNumber: Int): Game {
         playerAccount = playersNumber
         val players: MutableList<Player> = mutableListOf()
 
-        for(i in 0 until playerAccount){
-            if(i == 0){
+        for (i in 0 until playerAccount) {
+            if (i == 0) {
                 players.add(Player(name = "Player$i", cards = mutableListOf(), shouldPlay = true, hasPickedUp = false))
-            }else{
+            } else {
                 players.add(Player(name = "Player$i", cards = mutableListOf(), shouldPlay = false, hasPickedUp = false))
             }
 
@@ -33,16 +32,16 @@ object GameMaster{
         currentPlayer = players[0]
         gameDeck = generateDeck().toMutableList()
 
-        for(i in 0 until 7 * playerAccount) {
-            players[i% playerAccount].cards.add(gameDeck[0])
+        for (i in 0 until 7 * playerAccount) {
+            players[i % playerAccount].cards.add(gameDeck[0])
             gameDeck.removeAt(0)
         }
 
-        return Game(players = players, gameDirection = playingDirection)
+        return Game(players = players)
     }
 
-    private fun generateDeck() : List<Card>{
-        var cards : MutableList<Card> = mutableListOf()
+    private fun generateDeck(): List<Card> {
+        val cards: MutableList<Card> = mutableListOf()
 
         cards.addAll(generateCardsFor(CardColor.BLUE))
         cards.addAll(generateCardsFor(CardColor.RED))
@@ -54,23 +53,23 @@ object GameMaster{
         return cards.shuffled()
     }
 
-    private fun generateCardsFor(color: CardColor):MutableList<Card>{
-        val cardsForColor : MutableList<Card> = mutableListOf()
+    private fun generateCardsFor(color: CardColor): MutableList<Card> {
+        val cardsForColor: MutableList<Card> = mutableListOf()
 
         cardsForColor.add(Card(cardNumber = 0, cardColor = color, cardType = CardType.NORMAL))
 
-        for (i in 1..9){
+        for (i in 1..9) {
             cardsForColor.add(Card(cardNumber = i, cardColor = color, cardType = CardType.NORMAL))
             cardsForColor.add(Card(cardNumber = i, cardColor = color, cardType = CardType.NORMAL))
         }
         return cardsForColor
     }
 
-    private fun generatePowerCards() : MutableList<Card>{
+    private fun generatePowerCards(): MutableList<Card> {
         val powerCards: MutableList<Card> = mutableListOf()
         val colors = CardColor.values()
 
-        for(i in 0 until 4){
+        for (i in 0 until 4) {
             // Add 2  +2
             powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.PLUS_2))
             powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.PLUS_2))
@@ -89,9 +88,4 @@ object GameMaster{
         return powerCards
     }
 
-}
-
-enum class GameDirection(){
-    LEFT,
-    RIGHT
 }

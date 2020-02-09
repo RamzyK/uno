@@ -2,7 +2,7 @@ package module
 
 import module.game.GameConsole
 
-fun main(args: Array<String>) {
+fun main() {
     startTheGame()
 }
 

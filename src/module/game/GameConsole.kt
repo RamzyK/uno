@@ -3,11 +3,10 @@ package module.game
 import data.GameMaster
 import data.huge_title
 import data.model.game.Game
-import kotlin.reflect.jvm.internal.impl.load.java.Constant
 
-class GameConsole(): GameView {
+class GameConsole : GameView {
 
-    val presenter = GamePresenter(this)
+    private val presenter = GamePresenter(this)
 
     init {
         presenter.initGame()
@@ -15,13 +14,12 @@ class GameConsole(): GameView {
 
     //region  * * * Override functions * * *
     override fun showWelcomeMessage() {
-       println(huge_title)
-
+        println(huge_title)
     }
 
     override fun askForPlayersNumber() {
         println("Combien de joueurs y a-t-il ?")
-        readLine()?.let{
+        readLine()?.let {
             presenter.manageResponse(response = it)
         }
     }
@@ -31,8 +29,8 @@ class GameConsole(): GameView {
     }
 
     override fun showPlayers(game: Game) {
-        for(player in game.players){
-            println(player )
+        for (player in game.players) {
+            println(player)
         }
     }
 
@@ -45,11 +43,11 @@ class GameConsole(): GameView {
         print(GameMaster.currentPlayer.name + ", À toi de jouer:\n\n")
         print("Tes cartes: " + GameMaster.currentPlayer.cards)
         print("\nQuelle carte veux-tu jouer (position entre 1 & " + GameMaster.currentPlayer.cards.size + ")? \n\n")
-        if(GameMaster.currentPlayer.hasPickedUp) print("p pour passer le tour (Vous avez déjà pioché)\n") else print("p pour la pioche\n")
+        if (GameMaster.currentPlayer.hasPickedUp) print("p pour passer le tour (Vous avez déjà pioché)\n") else print("p pour la pioche\n")
     }
 
-    override fun showWtfResponseMessage(errorMessage: String) {
-        print(errorMessage)
+    override fun showMessage(message: String) {
+        print(message)
     }
 
     override fun showPlayedCard() {
@@ -66,8 +64,8 @@ class GameConsole(): GameView {
 
     }
 
-    override fun shosErroCardChosen() {
-        println("Tu ne peux pas jouer cette carte, elle 'est pas du bon numéro ou de la bonne couleur")
+    override fun showErrorCardChosen() {
+        println("Tu ne peux pas jouer cette carte, elle n'est pas du bon numéro ou de la bonne couleur")
     }
 
     //endregion
