@@ -70,18 +70,17 @@ object GameMaster {
         val colors = CardColor.values()
 
         for (i in 0 until 4) {
-            // Add 2  +2
             powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.PLUS_2))
             powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.PLUS_2))
-            // Add 2  change sens
+
             powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.CHANGE_SENS))
             powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.CHANGE_SENS))
-            // Add 2  block next
+
             powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.BLOCK_NEXT))
             powerCards.add(Card(cardNumber = -1, cardColor = colors[i], cardType = CardType.BLOCK_NEXT))
-            // Add 1  Joker
+
             powerCards.add(Card(cardNumber = -1, cardColor = CardColor.POWER, cardType = CardType.JOKER))
-            // Add 1  +4
+
             powerCards.add(Card(cardNumber = -1, cardColor = CardColor.POWER, cardType = CardType.PLUS_4))
         }
 

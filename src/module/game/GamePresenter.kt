@@ -61,14 +61,10 @@ class GamePresenter(var view: GameView) {
     }
 
     private fun playTheCard() {
-        view.showMessage("Entre le numéro correspondant à la carte que tu veux jouer ;) : ")
+        view.showMessage("Entre le numéro correspondant à la carte que tu veux jouer : ")
         readLine()?.let {
             if (it.isNotEmpty()) {
-                if (it == "p") {
-                    drew()
-                } else {
-                    checkPlayerCardChoice(it)
-                }
+                if (it == "p") drew() else checkPlayerCardChoice(it)
             } else {
                 view.showMessage(
                     "Il faut choisir une carte pour passer le tour\n\n\nQuelle carte veux-tu jouer (position entre 1 & "
@@ -81,7 +77,6 @@ class GamePresenter(var view: GameView) {
     }
 
     private fun isPossibleToPlay(card: Card) {
-        // Last card played is a power card
         when (card.cardType) {
             CardType.BLOCK_NEXT -> blockNextPlayer()
             CardType.CHANGE_SENS -> changeGameDirection(card)
@@ -111,12 +106,12 @@ class GamePresenter(var view: GameView) {
                 }
             }
             CardType.PLUS_2 -> {
-                for (i in 0 until 4) {
+                for (i in 0 until 2) {
                     GameMaster.currentPlayer.cards.add(GameMaster.gameDeck[0])
                     GameMaster.gameDeck.removeAt(0)
                 }
             }
-            CardType.JOKER -> print("Choisir une couleur NOT DONE")
+            CardType.JOKER -> addJokerCard(card)
             CardType.NORMAL -> return
         }
     }
@@ -132,15 +127,12 @@ class GamePresenter(var view: GameView) {
         val lastCardPlayed = GameMaster.playedCards[0]
         val lastPlayerPosition: Int = game.players.indexOf(GameMaster.currentPlayer)
 
-        // Last card played is a normal card
         if (card.cardNumber == lastCardPlayed.cardNumber || card.cardColor == lastCardPlayed.cardColor) {
-            // Same number, same or different color
             GameMaster.playedCards.add(0, card)
             GameMaster.currentPlayer.cards.remove(card)
             GameMaster.currentPlayer = game.players[(lastPlayerPosition + 1) % (game.players.size)]
             manageTurns()
         } else {
-            // Card had different number or different color
             view.showErrorCardChosen()
             playTheCard()
         }
@@ -159,7 +151,6 @@ class GamePresenter(var view: GameView) {
             GameMaster.currentPlayer.cards.remove(card)
             GameMaster.currentPlayer = game.players[(currentPlayerIndex + 2) % (game.players.size)]
         } else {
-            // Card has different number or different color
             view.showErrorCardChosen()
             playTheCard()
         }
@@ -177,10 +168,8 @@ class GamePresenter(var view: GameView) {
 
     private fun changeGameDirection(card: Card) {
         if (GameMaster.playedCards[0].cardType == CardType.CHANGE_SENS) {
-            // Last card was not a normal card
             reversePlayers(card)
         } else {
-            // Last card was a normal card
             if (GameMaster.playedCards[0].cardColor == card.cardColor) {
                 reversePlayers(card)
             } else {
@@ -207,11 +196,9 @@ class GamePresenter(var view: GameView) {
 
     private fun addJokerCard(card: Card) {
         val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
-        println("Quelle couleur veux-tu choisir ?")
-        var count = 1
-        for (color in CardColor.values()) {
-            println("$count- " + color.colorName)
-            count++
+        view.showMessage("Quelle couleur veux-tu choisir ?")
+        for ((count, color) in CardColor.values().withIndex()) {
+            view.showMessage("${count+1} " + color.colorName)
         }
         readLine()?.let {
             if (it.isNotEmpty()) {
@@ -222,16 +209,14 @@ class GamePresenter(var view: GameView) {
                     }
                     else -> {
                         GameMaster.currentColor = CardColor.values()[it.toInt() - 1]
-                        println("Couleur du jeu: " + GameMaster.currentColor.colorName)
+                        view.showMessage("Couleur du jeu: " + GameMaster.currentColor.colorName)
                         val nextPlayerPosition = (currentPlayerIndex + 2) % (game.players.size)
                         GameMaster.currentPlayer = game.players[nextPlayerPosition]
                         manageTurns()
                     }
                 }
             } else {
-                view.showMessage("Il faut choisir une carte pour passer le tour\n")
-                print(
-                    "\n\nQuelle carte veux-tu jouer (position entre 1 & "
+                view.showMessage("Il faut choisir une carte pour passer le tour\n\n\nQuelle carte veux-tu jouer (position entre 1 & "
                             + GameMaster.currentPlayer.cards.size
                             + ")? \n"
                 )
@@ -251,14 +236,14 @@ class GamePresenter(var view: GameView) {
             manageTurns()
         } else {
             if (GameMaster.gameDeck.size == 0) {
-                println("Impossible de piocher il n'y a plus de carte")
+                view.showMessage("Impossible de piocher il n'y a plus de carte")
                 manageTurns()
                 return
             }
             GameMaster.currentPlayer.cards.add(GameMaster.gameDeck[0])
             GameMaster.gameDeck.removeAt(0)
             GameMaster.currentPlayer.hasPickedUp = true
-            println("${GameMaster.currentPlayer.name} a pioché\n")
+            view.showMessage("${GameMaster.currentPlayer.name} a pioché\n")
             manageTurns()
         }
     }
@@ -281,6 +266,6 @@ class GamePresenter(var view: GameView) {
             }
         }
     }
-    //
+    //endregion
 
 }
