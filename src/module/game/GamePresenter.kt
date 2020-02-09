@@ -5,6 +5,7 @@ import data.model.card.Card
 import data.model.card.CardColor
 import data.model.card.CardType
 import data.model.game.Game
+import kotlin.system.exitProcess
 
 class GamePresenter(var view: GameView) {
 
@@ -130,9 +131,18 @@ class GamePresenter(var view: GameView) {
         if (card.cardNumber == lastCardPlayed.cardNumber || card.cardColor == lastCardPlayed.cardColor) {
             GameMaster.playedCards.add(0, card)
             GameMaster.currentPlayer.cards.remove(card)
-            GameMaster.currentPlayer = game.players[(lastPlayerPosition + 1) % (game.players.size)]
-            manageTurns()
-        } else {
+            if(GameMaster.currentPlayer.cards.size == 1){
+                view.shoutUno()
+            }
+            if(GameMaster.currentPlayer.cards.size == 0){
+                println("T'es vraiment un champion Bernard")
+                exitProcess(0)
+            }else{
+                GameMaster.currentPlayer = game.players[(lastPlayerPosition+1) % (game.players.size)]
+                manageTurns()
+            }
+        }else{
+            // Card had different number or different color
             view.showErrorCardChosen()
             playTheCard()
         }
@@ -236,7 +246,7 @@ class GamePresenter(var view: GameView) {
             manageTurns()
         } else {
             if (GameMaster.gameDeck.size == 0) {
-                view.showMessage("Impossible de piocher il n'y a plus de carte")
+                view.showMessage("Impossible de piocher il n'y a plus de carte\n")
                 manageTurns()
                 return
             }
