@@ -43,10 +43,10 @@ object GameMaster {
     private fun generateDeck(): List<Card> {
         val cards: MutableList<Card> = mutableListOf()
 
-        cards.addAll(generateCardsFor(CardColor.BLUE))
-        cards.addAll(generateCardsFor(CardColor.RED))
-        cards.addAll(generateCardsFor(CardColor.GREEN))
-        cards.addAll(generateCardsFor(CardColor.YELLOW))
+        //cards.addAll(generateCardsFor(CardColor.BLUE))
+        //cards.addAll(generateCardsFor(CardColor.RED))
+        //cards.addAll(generateCardsFor(CardColor.GREEN))
+        //cards.addAll(generateCardsFor(CardColor.YELLOW))
 
         cards.addAll(generatePowerCards())
 
