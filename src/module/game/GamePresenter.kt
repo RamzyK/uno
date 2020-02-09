@@ -82,7 +82,7 @@ class GamePresenter(var view: GameView){
     private fun checkCardIsPossibleToPlay(card: Card){
         // Last card played is a power card
         when(card.cardType){
-            CardType.BLOCK_NEXT -> blockNextPlayer()
+            CardType.BLOCK_NEXT -> blockNextPlayer(card)
             CardType.CHANGE_SENS -> changeGameDirection(card)
             CardType.PLUS_4 -> addPlus4Card(card)
             CardType.PLUS_2 -> addPlus2Card()
@@ -189,9 +189,18 @@ class GamePresenter(var view: GameView){
         GameMaster.currentPlayer = game.players[nextPlayerPosition]
     }
 
-    private fun blockNextPlayer(){
+    private fun blockNextPlayer(card : Card){
         val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
-        GameMaster.currentPlayer = game.players[(currentPlayerIndex + 2) % (game.players.size)]
+        val lastCardPlayed = GameMaster.playedCards[0]
+        if(card.cardColor == lastCardPlayed.cardColor && card.cardType == CardType.BLOCK_NEXT) {
+            GameMaster.currentPlayer = game.players[(currentPlayerIndex + 2) % (game.players.size)]
+            GameMaster.playedCards.add(0, card)
+            manageTurns()
+        } else {
+            view.shosErroCardChosen()
+            playTheCard()
+        }
+
     }
 
     private fun addJokerCard(card: Card){
