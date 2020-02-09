@@ -24,11 +24,11 @@ class GamePresenter(var view: GameView) {
                     view.askForPlayersNumber()
                 }
                 else -> {
-                    if (response.toInt() > 1) {
+                    if (response.toInt() in 2..4) {
                         view.initializingPlayersMessage(response)
                         initPlayers(playerNumber = response.toInt())
                     } else {
-                        view.showMessage("Il faut au moins 2 joueurs\n\n")
+                        view.showMessage("Il faut entre 2 et 4 joueurs\n\n")
                         view.askForPlayersNumber()
                     }
                 }
@@ -123,6 +123,14 @@ class GamePresenter(var view: GameView) {
         GameMaster.currentPlayer = game.players[newCurrentPlayerPos]
     }
 
+    private fun shuffleDrew() {
+        val lastCard = GameMaster.playedCards.first()
+        GameMaster.gameDeck = GameMaster.playedCards
+        GameMaster.playedCards.clear()
+        GameMaster.playedCards.add(lastCard)
+        GameMaster.gameDeck.shuffle()
+    }
+
     // region * * * * * * * * * * * * * * * SPECIAL CARDS ACTION SECTION * * * * * * * * * * * * * * *
     private fun normalCardPlayed(card: Card) {
         val lastCardPlayed = GameMaster.playedCards[0]
@@ -131,17 +139,17 @@ class GamePresenter(var view: GameView) {
         if (card.cardNumber == lastCardPlayed.cardNumber || card.cardColor == lastCardPlayed.cardColor) {
             GameMaster.playedCards.add(0, card)
             GameMaster.currentPlayer.cards.remove(card)
-            if(GameMaster.currentPlayer.cards.size == 1){
+            if (GameMaster.currentPlayer.cards.size == 1) {
                 view.shoutUno()
             }
-            if(GameMaster.currentPlayer.cards.size == 0){
-                println("T'es vraiment un champion Bernard")
+            if (GameMaster.currentPlayer.cards.size == 0) {
+                view.showMessage("T'es vraiment un champion ${GameMaster.currentPlayer.name}")
                 exitProcess(0)
-            }else{
-                GameMaster.currentPlayer = game.players[(lastPlayerPosition+1) % (game.players.size)]
+            } else {
+                GameMaster.currentPlayer = game.players[(lastPlayerPosition + 1) % (game.players.size)]
                 manageTurns()
             }
-        }else{
+        } else {
             // Card had different number or different color
             view.showErrorCardChosen()
             playTheCard()
@@ -208,7 +216,7 @@ class GamePresenter(var view: GameView) {
         val currentPlayerIndex = game.players.indexOf(GameMaster.currentPlayer)
         view.showMessage("Quelle couleur veux-tu choisir ?")
         for ((count, color) in CardColor.values().withIndex()) {
-            view.showMessage("${count+1} " + color.colorName)
+            view.showMessage("${count + 1} " + color.colorName)
         }
         readLine()?.let {
             if (it.isNotEmpty()) {
@@ -226,7 +234,8 @@ class GamePresenter(var view: GameView) {
                     }
                 }
             } else {
-                view.showMessage("Il faut choisir une carte pour passer le tour\n\n\nQuelle carte veux-tu jouer (position entre 1 & "
+                view.showMessage(
+                    "Il faut choisir une carte pour passer le tour\n\n\nQuelle carte veux-tu jouer (position entre 1 & "
                             + GameMaster.currentPlayer.cards.size
                             + ")? \n"
                 )
@@ -245,8 +254,13 @@ class GamePresenter(var view: GameView) {
             goToNextPlayer()
             manageTurns()
         } else {
-            if (GameMaster.gameDeck.size == 0) {
-                view.showMessage("Impossible de piocher il n'y a plus de carte\n")
+            if (GameMaster.gameDeck.size == 0 && GameMaster.playedCards.size > 1) {
+                view.showMessage("Impossible de piocher il n'y a plus de carte.\nNous allons mélangé les cartes jouées et les mettre à nouveau dans la pioche.\n")
+                shuffleDrew()
+                manageTurns()
+                return
+            } else if (GameMaster.gameDeck.size == 0 && GameMaster.playedCards.size < 2){
+                view.showMessage("Impossible de piocher davantage. Merci de jouer une carte.\n")
                 manageTurns()
                 return
             }

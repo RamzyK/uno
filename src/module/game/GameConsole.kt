@@ -14,7 +14,7 @@ class GameConsole : GameView {
 
     //region  * * * Override functions * * *
     override fun showWelcomeMessage() {
-        println(huge_title)
+        print(huge_title)
     }
 
     override fun askForPlayersNumber() {
@@ -35,14 +35,14 @@ class GameConsole : GameView {
     }
 
     override fun putFirstCardFromDeck() {
-        println("La partie peut commencer!\n\n\n")
+        println("La partie peut commencer!\n")
         presenter.manageTurns()
     }
 
     override fun showCurrentPlayer() {
         print(GameMaster.currentPlayer.name + ", À toi de jouer:\n\n")
         print("Tes cartes: " + GameMaster.currentPlayer.cards)
-        print("\nQuelle carte veux-tu jouer (position entre 1 & " + GameMaster.currentPlayer.cards.size + ")? \n\n")
+        print("\nQuelle carte veux-tu jouer (position entre 1 & " + GameMaster.currentPlayer.cards.size + ") ? \n\n")
         if (GameMaster.currentPlayer.hasPickedUp) print("p pour passer le tour (Vous avez déjà pioché)\n") else print("p pour la pioche\n")
     }
 
@@ -56,12 +56,8 @@ class GameConsole : GameView {
         println("Couleur actuelle: ${lastCardPlayed.cardColor.colorName}\n\n")
     }
 
-    override fun showPowerCardActionOnNextPlayer() {
-
-    }
-
     override fun shoutUno() {
-
+        println("Joueur ${GameMaster.currentPlayer.name} est à UNO !")
     }
 
     override fun showErrorCardChosen() {

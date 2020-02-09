@@ -8,7 +8,7 @@ import data.model.game.Game
 
 object GameMaster {
 
-    var playerAccount = 4
+    private var playerAccount = 4 //Default value
     var gameDeck: MutableList<Card> = mutableListOf()
     var playedCards: MutableList<Card> = mutableListOf()
     lateinit var currentPlayer: Player

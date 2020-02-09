@@ -12,7 +12,6 @@ interface GameView{
     fun putFirstCardFromDeck()
     fun showMessage(message: String)
     fun showPlayedCard()
-    fun showPowerCardActionOnNextPlayer()
     fun shoutUno()
     fun showErrorCardChosen()
     
