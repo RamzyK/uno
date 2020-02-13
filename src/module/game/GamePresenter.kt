@@ -215,7 +215,7 @@ class GamePresenter(var view: GameView) {
             GameMaster.playedCards.add(0, card)
             manageTurns()
         } else {
-            view.shosErroCardChosen()
+            view.showErrorCardChosen()
             playTheCard()
         }
 
